@@ -1,0 +1,72 @@
+﻿@model IEnumerable<Person_Test.Models.Person>
+
+@{
+    ViewBag.Title = "Person Application";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>PERSON - select and edit</h2>
+<div class="row">
+    <div class="col-sm-2 col-lg-5">
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LastName)
+                </th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.CheckBox(item.FirstName, false, new { id = "cb" + item.PersonId }) </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+</div>
+
+<div>@ViewBag.Status</div>
+<div id="editor"></div>
+
+<script>
+    $(function () {
+        $('input[type="checkbox"]').change(function (ee) {
+            var id = this.id;
+            if ($(this).prop('checked') == true) {
+                $('input[type="checkbox"]').each(function (index, element) {
+                    if (element.id != id) {
+                        element.checked = false;
+                        ee.stopPropagation();
+                    }
+                })
+                $.ajax({
+                    url: "/Home/GetPerson",
+                    type: "POST",
+                    data: { id: this.id },
+                    dataType: "html",
+                    success: function (e) {
+                        currentPerson = e;
+                        $("#editor").html(e);
+                    },
+                    error: function (e) {
+                        $("#editor").html(e);
+                        alert(e.responseText);
+                    }
+                });
+            } else {
+                $("#editor").html("");
+            }
+        });
+    });
+</script>
